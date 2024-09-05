@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Expenses
+{% endblock title %}
+
+{% block content %}
+
+<div class="flex justify-end m-4">
+    <a role="button" class="btn" href="{% url "add-expense" %}">Add Expense</a>
+</div>
+
+<div class="overflow-x-auto">
+    <table class="table table-pin-cols table-zebra table-xs m-4">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Amount</th>
+          <th>Bank</th>
+          <th>Desciption</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for expense in expenses %}
+        <tr class="hover" onclick="window.location.href='{% url "view-expense" expense.pk %}'" style="cursor: pointer;">
+            <td>{{ forloop.counter }}</td>
+            <td>{{ expense.amount }}</td>
+            <td>{{ expense.bank }}</td>
+            <td>{{ expense.description }}</td>
+            <td>{{ expense.created_at }}</td>
+        </tr>
+        {% endfor%}
+      </tbody>
+      <tfoot>
+        <tr>
+            <th>ID</th>
+            <th>Amount</th>
+            <th>Bank</th>
+            <th>Desciption</th>
+            <th>Created At</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+{% endblock content %}

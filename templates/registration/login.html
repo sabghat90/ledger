@@ -1,0 +1,30 @@
+{% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="{% static "img/favicon/favicon.ico" %}">
+    <title>Login - Ledger</title>
+</head>
+<body>
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="card w-full max-w-md shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title text-center">Login</h2>
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    {% render_field form.username placeholder="Username" class="input input-bordered w-full my-4" %}
+                    {% render_field form.password placeholder="Password" type="password" class="input input-bordered w-full mb-4" %}
+                    <button type="submit" class="btn btn-primary w-full">Login</button>
+                </form>
+                <p class="text-center mt-4">Don't have an account? <a href="{% url 'register' %}" class="link link-primary">Register here</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

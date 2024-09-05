@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Orders
+{% endblock title %}
+
+{% block content %}
+
+<div class="flex justify-end m-4">
+    <a role="button" class="btn" href="{% url "add-order" %}">Add Order</a>
+</div>
+
+<div class="overflow-x-auto">
+    <table class="table table-pin-cols table-zebra table-xs m-4">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Date</th>
+          <th>Name</th>
+          <th>Amount</th>
+          <th>Commission</th>
+          <th>Account Number</th>
+          <th>Agent</th>
+          <th>Order Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr class="hover" onclick="window.location.href='{% url "view-order" order.pk %}'" style="cursor: pointer;">
+            <td>{{ forloop.counter }}</td>
+            <td>{{ order.created_at }}</td>
+            <td>{{ order.name }}</td>
+            <td>{{ order.amount }}</td>
+            <td>{{ order.commission }}</td>
+            <td>{{ order.account_number }}</td>
+            <td>{{ order.agent }}</td>
+            <td>{{ order.order_type }}</td>
+        </tr>
+        {% endfor%}
+      </tbody>
+      <tfoot>
+        <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Commission</th>
+            <th>Account Number</th>
+            <th>Agent</th>
+            <th>Order Type</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+{% endblock content %}

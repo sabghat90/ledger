@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block title %}
+View Order
+{% endblock  %}
+
+{% block content %}
+
+<div class="m-4">
+    <h1 class="text-2xl font-bold mb-4">Order Details: {{order.id}}</h1>
+    <div class="divider"></div>
+
+    <table>
+        <tr>
+            <th style="text-align: left;">Order ID</th>
+            <td>{{ order.id }}</td>
+        </tr>
+        <tr>
+            <th style="text-align: left;">Date</th>
+            <td>{{ order.created_at }}</td>
+        </tr>
+        <tr>
+            <th style="text-align: left;">Name</th>
+            <td>{{ order.name }}</td>
+        </tr>
+        <tr>
+            <th style="text-align: left;">Amount</th>
+            <td>{{ order.amount }}</td>
+        </tr>
+        <tr>
+            <th style="text-align: left;">Commission</th>
+            <td>{{ order.commission }}</td>
+        </tr>
+        <tr>
+            <th style="text-align: left;">Account Number</th>
+            <td>{{ order.account_number }}</td>
+        </tr>
+
+        <tr>
+            <th style="text-align: left;">Order Type</th>
+            <td>{{ order.order_type }}</td>
+        </tr>
+
+    </table>
+
+    <div class="divider"></div>
+
+    <h1 class="text-2xl font-bold mb-4">Sender Details: {{order.credit_bank_account.account_holder_name}} | {{order.credit_bank_account.account_number}}</h1>
+
+    <div class="divider"></div>
+
+    <a href="{% url 'update-order' order.id %}" class="btn btn-success">Edit</a>
+
+    <a href="{% url 'delete-order' order.id %}" class="btn btn-error">Delete</a>
+
+
+{% endblock %}

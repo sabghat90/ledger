@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Accounts
+{% endblock title %}
+
+{% block content %}
+
+<div class="flex justify-end m-4">
+    <a role="button" class="btn" href="{% url "add-account" %}">Add Account</a>
+</div>
+
+<div class="overflow-x-auto">
+    <table class="table table-pin-cols table-zebra table-xs m-4">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Account Number</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Bank Name</th>
+          <th>Balance</th>
+          <th>Created At</th>
+          <th>Updated At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for account in accounts %}
+        <tr onclick="window.location.href='{% url "view-account" account.pk %}'" style="cursor: pointer;">
+            <td>{{ forloop.counter }}</td>
+            <td>{{ account.account_number }}</td>
+            <td>{{ account.account_holder_name }}</td>
+            <td>{{ account.account_type }}</td>
+            <td>{{ account.bank }}</td>
+            <td>{{ account.balance }}</td>
+            <td>{{ account.created_at }}</td>
+            <td>{{ account.updated_at }}</td>
+        </tr>
+        {% endfor%}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th>ID</th>
+          <th>Account Number</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Bank Name</th>
+          <th>Balance</th>
+          <th>Created At</th>
+          <th>Updated At</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+{% endblock content %}

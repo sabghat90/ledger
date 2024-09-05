@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% load widget_tweaks %}
+
+{% block title %}
+Add Order
+{% endblock title %}
+
+{% block content %}
+
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">
+        {% if form.instance.pk %}
+        Update Order
+        {% else %}
+        Add Order
+        {% endif %}
+    </h1>
+    <form method="post" action="{% if form.instance.pk %}{% url 'update-order' form.instance.pk %}{% else %}{% url 'add-order' %}{% endif %}">
+        {% csrf_token %}
+        
+            {% render_field form.user option="Select User" class="select select-bordered w-full max-w-xs m-4" %}
+            {% render_field form.agent placeholder="Agent" class="select select-bordered w-full max-w-xs m-4" %}
+            {% render_field form.created_at placeholder="Date" type="date" class="w-full max-w-xs m-4" %}
+            {% render_field form.name placeholder="Name" class="input input-bordered w-full max-w-xs m-4" %}
+            {% render_field form.account_number placeholder="Account Number" class="input input-bordered w-full max-w-xs m-4" %}
+            {% render_field form.amount placeholder="Amount" class="input input-bordered w-full max-w-xs m-4" %}
+            {% render_field form.commission placeholder="Commission" class="input input-bordered w-full max-w-xs m-4" %}
+            {% render_field form.order_type placeholder="Order Type" class="select select-bordered w-full max-w-xs m-4" %}
+            {% render_field form.credit_bank_account placeholder="Credit Bank Account" class="select select-bordered w-full max-w-xs m-4" %}
+            {% render_field form.agent_name placeholder="Agent Name" class="input input-bordered w-full max-w-xs m-4" %}
+
+        <div class="text-center m-4">
+            {% if form.instance.pk %}
+            <button type="submit" class="btn btn-wide">Update</button>
+            {% else %}
+            <button type="submit" class="btn btn-wide">Submit</button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{% endblock content %}
