@@ -30,7 +30,7 @@ This project is a comprehensive Ledger Management System built with Django and P
 
 1. **Clone the repository:**
     ```bash
-    git clone https://github.com/sabghat90/ledger_core.git
+    git clone https://github.com/sabghat90/ledger.git
     cd ledger_core
     ```
 
