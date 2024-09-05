@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% load humanize %}
 
 {% block title %}
 Orders
@@ -30,11 +31,17 @@ Orders
             <td>{{ forloop.counter }}</td>
             <td>{{ order.created_at }}</td>
             <td>{{ order.name }}</td>
-            <td>{{ order.amount }}</td>
+            <td>{{ order.amount|intcomma }}</td>
             <td>{{ order.commission }}</td>
             <td>{{ order.account_number }}</td>
             <td>{{ order.agent }}</td>
-            <td>{{ order.order_type }}</td>
+            {% if order.order_type == PENDING %}
+            <td><div class="badge badge-neutral">{{ order.order_type }}</div></td>
+            {% elif order.order_type == PAID %}
+            <td><div class="badge badge-primary">{{ order.order_type }}</div></td>
+            {% elif order.order_type == CANCEL %}
+            <td><div class="badge badge-accent">{{ order.order_type }}</div></td>
+            {% endif %}
         </tr>
         {% endfor%}
       </tbody>

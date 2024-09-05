@@ -47,3 +47,7 @@ qodana.yaml
 
 # migrations
 migrations
+
+# staticfiles
+staticfiles
+staticfiles/*

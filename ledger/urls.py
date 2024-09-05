@@ -22,4 +22,6 @@ urlpatterns = [
     path('view-expense/<int:pk>/', views.view_expense, name='view-expense'),
     path('update-expense/<int:pk>/', views.update_expense, name='update-expense'),
     path('delete-expense/<int:pk>/', views.delete_expense, name='delete-expense'),
+    path('agents/', views.agents, name='agents'),
+    path('<int:pk>/view-agent/', views.view_agent, name='view-agent')
 ]

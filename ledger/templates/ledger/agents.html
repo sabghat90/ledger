@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Agents
+{% endblock title %}
+
+{% block content %}
+
+<div class="overflow-x-auto">
+    <table class="table table-pin-cols table-zebra table-xs m-4">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Phone Number</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for agent in agents %}
+        <tr class="hover" onclick="window.location.href='{% url "view-agent" agent.pk %}'" style="cursor: pointer;">
+            <td>{{ forloop.counter }}</td>
+            <td>{{ agent.name }}</td>
+            <td>{{ agent.username }}</td>
+            <td>{{ agent.phone_number }}</td>
+        </tr>
+        {% endfor%}
+      </tbody>
+      <tfoot>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Phone Number</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+{% endblock content %}

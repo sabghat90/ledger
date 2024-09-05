@@ -80,7 +80,17 @@ def logout(request):
 
 def orders(request):
     orders = Order.objects.all()
-    return render(request, 'ledger/orders.html', {'orders': orders})
+    PENDING = utils.PENDING_ORDERS
+    PAID = utils.PAID_ORDERS
+    CANCEL = utils.CANCEL_ORDERS
+
+    context = {
+        'orders': orders,
+        'PENDING': PENDING,
+        'PAID': PAID,
+        'CANCEL': CANCEL,
+    }
+    return render(request, 'ledger/orders.html', context)
 
 
 def add_order(request):
@@ -93,22 +103,29 @@ def add_order(request):
             account = form.cleaned_data['credit_bank_account']
             commission = form.cleaned_data['commission'] or utils.calculate_commission(order.amount)
             
+            print(commission)
+            print(order)
             try:
                 if order_type == utils.PAID_ORDERS:
-                
-                    if account.balance < order.amount:
-                        return render(request, 'ledger/add_order.html', {'form': form, 'error': 'Insufficient balance'})
-                    
                     account.balance -= order.amount
                     account.balance += commission
+                    order.commission = commission
+                    order.amount -= commission
+                    order.save()
+                    account.save()
+                    messages.success(request, 'Order added successfully')
+                    return redirect('orders')
+                    
                 elif order_type == utils.PENDING_ORDERS:
-                
-                    if account.balance < order.amount:
-                        return render(request, 'ledger/add_order.html', {'form': form, 'error': 'Insufficient balance'})
-                    
                     account.balance -= order.amount
                     account.balance += commission
-                
+                    order.commission = commission
+                    order.amount -= commission
+                    order.save()
+                    account.save()
+                    messages.success(request, 'Order added successfully')
+                    return redirect('orders')
+                    
                 elif order_type == utils.CANCEL_ORDERS:
                     order.save()
                     messages.success(request, 'Order cancelled successfully')
@@ -123,7 +140,11 @@ def add_order(request):
 
 def accounts(request):
     accounts = Account.objects.all()
-    return render(request, 'ledger/accounts.html', {'accounts': accounts})
+
+    context = {
+        'accounts': accounts
+    }
+    return render(request, 'ledger/accounts.html', context)
 
 
 def add_account(request):
@@ -141,11 +162,18 @@ def add_account(request):
 def view_account(request, pk):
     account = get_object_or_404(Account, pk=pk)
     orders = Order.objects.filter(credit_bank_account=account)
+    PENDING = utils.PENDING_ORDERS
+    PAID = utils.PAID_ORDERS
+    CANCEL = utils.CANCEL_ORDERS
 
     context = {
         'account': account,
-        'orders': orders
+        'orders': orders,
+        'PENDING': PENDING,
+        'PAID': PAID,
+        'CANCEL': CANCEL
     }
+
     return render(request, 'ledger/view_account.html', context)
 
 
@@ -166,23 +194,23 @@ def update_order(request, pk):
         if form.is_valid():
             order = form.save(commit=False)
             account = form.cleaned_data['credit_bank_account']
+            commission = form.cleaned_data['commission'] or utils.calculate_commission(order.amount)
             if form.cleaned_data['order_type'] == utils.PAID_ORDERS:
-                if account.balance < order.amount:
-                    return render(request, 'ledger/add_order.html', {'form': form, 'error': 'Insufficient balance'})
+                
                 account.balance -= order.amount
-                account.balance += utils.calculate_commission(order.amount)
-                order.commission = utils.calculate_commission(order.amount)
+                account.balance += commission
+                order.commission = commission
 
             elif form.cleaned_data['order_type'] == utils.CANCEL_ORDERS:
                 account.balance += order.amount
-                order.commission = 0
+                order.commission = commission
+                account.balance += commission
 
             elif form.cleaned_data['order_type'] == utils.PENDING_ORDERS:
-                if account.balance < order.amount:
-                    return render(request, 'ledger/add_order.html', {'form': form, 'error': 'Insufficient balance'})
+                
                 account.balance -= order.amount
-                account.balance += utils.calculate_commission(order.amount)
-                order.commission = utils.calculate_commission(order.amount)
+                account.balance += commission
+                order.commission = commission
 
             order.save()
             account.save()
@@ -253,3 +281,23 @@ def delete_expense(request, pk):
     expense.bank.save()
     expense.delete()
     return redirect('expense')
+
+
+def agents(request):
+    agents = Agent.objects.all()
+    
+    context = {
+        'agents': agents
+    }
+    return render(request, 'ledger/agents.html', context)
+
+
+def view_agent(request, pk):
+    agent = get_object_or_404(Agent, pk=pk)
+    orders = Order.objects.filter(agent=agent)
+
+    context = {
+        'agent': agent,
+        'orders': orders,
+    }
+    return render(request, 'ledger/view_agent.html', context)
