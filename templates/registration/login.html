@@ -1,4 +1,5 @@
 {% load static %}
+{% load static tailwind_tags %}
 {% load widget_tweaks %}
 <!DOCTYPE html>
 <html lang="en">
@@ -6,8 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    {% tailwind_css %}
     <link rel="icon" href="{% static "img/favicon/favicon.ico" %}">
     <title>Login - Ledger</title>
 </head>

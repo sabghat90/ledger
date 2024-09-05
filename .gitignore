@@ -41,3 +41,9 @@ Desktop.ini
 # Qodana
 .qodana/
 qodana.yaml
+
+# pytest_cache
+.pytest_cache/
+
+# migrations
+migrations

@@ -29,7 +29,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 # Application definition
+TAILWIND_APP_NAME = 'theme'
+
+AUTH_USER_MODEL = 'ledger.Agent'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -41,10 +48,12 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
 
     'ledger',
-    'widget_tweaks'
+    'widget_tweaks',
+    'tailwind',
+    'theme',
+    'django_browser_reload',
 ]
 
-AUTH_USER_MODEL = 'ledger.Agent'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,6 +64,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.LoginRequiredMiddleware",
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 ROOT_URLCONF = 'ledger_core.urls'
@@ -163,4 +173,4 @@ LOGIN_URL = '/accounts/login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-
+NPM_BIN_PATH = "C:\\Program Files\\nodejs\\npm.cmd"
