@@ -5,33 +5,52 @@ from .forms import *
 from django.contrib.auth import get_user_model
 from . import utils
 from django.db.models import Sum
+from django.db import IntegrityError
 from django.contrib.auth.decorators import login_not_required
 
 User = get_user_model()
 
 
-# Create your views here.
+def get_total_amount(order_type, month):
+    return int(Order.objects.filter(order_type=order_type, created_at__month=month).aggregate(Sum('amount'))['amount__sum'] or 0)
+
+
+def get_total_amount_for_month(month):
+    return int(Order.objects.filter(created_at__month=month).aggregate(Sum('amount'))['amount__sum'] or 0)
+
+
+def calculate_percentage_difference(current, previous):
+    if previous == 0:
+        return 0 if current == 0 else 100  # Avoid division by zero
+    return ((current - previous) / previous) * 100
+
+
 def index(request):
+    current_month = utils.GET_CURRENT_MONTH()
+    previous_month = current_month - 1 if current_month > 1 else 12
+
+    total_orders_current_month = get_total_amount_for_month(current_month)
+    total_orders_previous_month = get_total_amount_for_month(previous_month)
+
+    percentage_difference = calculate_percentage_difference(total_orders_current_month, total_orders_previous_month)
+
     orders = Order.objects.all()
     accounts = Account.objects.all()
 
-    total_paid_orders_amount = int(
-        Order.objects.filter(order_type=utils.PAID_ORDERS, created_at__month=utils.GET_CURRENT_MONTH()).aggregate(Sum('amount'))['amount__sum']) or 0
-    total_pending_orders_amount = int(
-        Order.objects.filter(order_type=utils.PENDING_ORDERS, created_at__month=utils.GET_CURRENT_MONTH()).aggregate(Sum('amount'))['amount__sum']) or int(0)
-    total_cancel_orders_amount = int(
-        Order.objects.filter(order_type=utils.CANCEL_ORDERS, created_at__month=utils.GET_CURRENT_MONTH()).aggregate(Sum('amount'))['amount__sum']) or int(0)
-    total_orders_for_current_month = int(sum(order.amount for order in orders if order.created_at.month == utils.GET_CURRENT_MONTH())) or 0
-    total_commission_for_current_month = int(sum(order.commission or 0 for order in orders if order.created_at.month == utils.GET_CURRENT_MONTH()))
-    
-    accounts_with_total_orders = []
-    for account in accounts:
-        total_orders_amount_for_account = Order.objects.filter(credit_bank_account=account).aggregate(Sum('amount'))['amount__sum']
-        accounts_with_total_orders.append({
+    total_paid_orders_amount = get_total_amount(utils.PAID_ORDERS, current_month)
+    total_pending_orders_amount = get_total_amount(utils.PENDING_ORDERS, current_month)
+    total_cancel_orders_amount = get_total_amount(utils.CANCEL_ORDERS, current_month)
+    total_orders_for_current_month = int(sum(order.amount for order in orders if order.created_at.month == current_month) or 0)
+    total_commission_for_current_month = int(sum(order.commission or 0 for order in orders if order.created_at.month == current_month))
+
+    accounts_with_total_orders = [
+        {
             'account': account,
-            'total_orders_amount': total_orders_amount_for_account or 0
-        })
-    
+            'total_orders_amount': Order.objects.filter(credit_bank_account=account).aggregate(Sum('amount'))['amount__sum'] or 0
+        }
+        for account in accounts
+    ]
+
     context = {
         'total_paid_orders_amount': total_paid_orders_amount,
         'total_pending_orders_amount': total_pending_orders_amount,
@@ -41,6 +60,7 @@ def index(request):
         'total_commission_for_current_month': total_commission_for_current_month,
         'current_month_name': utils.GET_CURRENT_MONTH_NAME,
         'next_month': utils.GET_NEXT_MONTH_NAME,
+        'percentage_difference': percentage_difference,
     }
 
     return render(request, 'ledger/index.html', context)
@@ -48,6 +68,8 @@ def index(request):
 
 @login_not_required
 def register(request):
+    if request.user.is_authenticated:
+        return redirect('index')
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -99,6 +121,8 @@ def add_order(request):
 
         if form.is_valid():
             order = form.save(commit=False)
+            order.agent = request.user
+            print(order.agent)
             order_type = form.cleaned_data['order_type']
             account = form.cleaned_data['credit_bank_account']
             commission = form.cleaned_data['commission'] or utils.calculate_commission(order.amount)
@@ -106,30 +130,18 @@ def add_order(request):
             print(commission)
             print(order)
             try:
-                if order_type == utils.PAID_ORDERS:
+                if order_type in [utils.PAID_ORDERS, utils.PENDING_ORDERS]:
                     account.balance -= order.amount
                     account.balance += commission
                     order.commission = commission
                     order.amount -= commission
-                    order.save()
-                    account.save()
-                    messages.success(request, 'Order added successfully')
-                    return redirect('orders')
-                    
-                elif order_type == utils.PENDING_ORDERS:
-                    account.balance -= order.amount
-                    account.balance += commission
-                    order.commission = commission
-                    order.amount -= commission
-                    order.save()
-                    account.save()
-                    messages.success(request, 'Order added successfully')
-                    return redirect('orders')
-                    
                 elif order_type == utils.CANCEL_ORDERS:
-                    order.save()
-                    messages.success(request, 'Order cancelled successfully')
-                    return redirect('orders')
+                    order.commission = commission
+
+                order.save()
+                account.save()
+                messages.success(request, 'Order added successfully')
+                return redirect('orders')
                 
             except Account.DoesNotExist:
                 return render(request, 'ledger/add_order.html', {'form': form, 'error': 'Account does not exist'})
@@ -139,7 +151,7 @@ def add_order(request):
 
 
 def accounts(request):
-    accounts = Account.objects.all()
+    accounts = Account.objects.filter(agent=request.user)
 
     context = {
         'accounts': accounts
@@ -148,16 +160,21 @@ def accounts(request):
 
 
 def add_account(request):
-    print("adding account")
     if request.method == 'POST':
         form = AddAccountForm(request.POST)
         if form.is_valid():
-            form.save()
-            print("added")
-            return redirect('accounts')
+            try:
+                account = form.save(commit=False)
+                account.agent = request.user
+                account.save()
+                return redirect('accounts')
+            except IntegrityError:
+                print('error')
+                form.add_error(None, 'This account is already added.')
     else:
         form = AddAccountForm()
     return render(request, 'ledger/add_account.html', {'form': form})
+
 
 def view_account(request, pk):
     account = get_object_or_404(Account, pk=pk)
@@ -187,7 +204,7 @@ def view_order(request, pk):
 
 def update_order(request, pk):
     order = get_object_or_404(Order, pk=pk)
-    
+
     if request.method == 'POST':
         form = AddOrderForm(request.POST, instance=order)
 
@@ -195,22 +212,19 @@ def update_order(request, pk):
             order = form.save(commit=False)
             account = form.cleaned_data['credit_bank_account']
             commission = form.cleaned_data['commission'] or utils.calculate_commission(order.amount)
-            if form.cleaned_data['order_type'] == utils.PAID_ORDERS:
-                
-                account.balance -= order.amount
-                account.balance += commission
-                order.commission = commission
+            order_type = form.cleaned_data['order_type']
 
-            elif form.cleaned_data['order_type'] == utils.CANCEL_ORDERS:
-                account.balance += order.amount
-                order.commission = commission
-                account.balance += commission
+            def update_account_balance_and_commission(order, account, commission, order_type):
+                if order_type in [utils.PAID_ORDERS, utils.PENDING_ORDERS]:
+                    account.balance -= order.amount
+                    account.balance += commission
+                    order.commission = commission
+                elif order_type == utils.CANCEL_ORDERS:
+                    account.balance += order.amount
+                    order.commission = commission
+                    account.balance += commission
 
-            elif form.cleaned_data['order_type'] == utils.PENDING_ORDERS:
-                
-                account.balance -= order.amount
-                account.balance += commission
-                order.commission = commission
+            update_account_balance_and_commission(order, account, commission, order_type)
 
             order.save()
             account.save()

@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% load humanize %}
 
 {% block title %}
 View Order
@@ -25,7 +26,7 @@ View Order
         </tr>
         <tr>
             <th style="text-align: left;">Amount</th>
-            <td>{{ order.amount }}</td>
+            <td>{{ order.amount|intcomma }}</td>
         </tr>
         <tr>
             <th style="text-align: left;">Commission</th>
@@ -51,7 +52,23 @@ View Order
 
     <a href="{% url 'update-order' order.id %}" class="btn btn-success">Edit</a>
 
-    <a href="{% url 'delete-order' order.id %}" class="btn btn-error">Delete</a>
+    <button class="btn btn-error" onclick="delete_modal.showModal()">Delete</button>
+
+    <dialog id="delete_modal" class="modal sm:modal-middle">
+        <div class="modal-box">
+          <h3 class="text-lg text-warning font-bold">Warning!</h3>
+          <p class="py-4">Do you want to delete this order?</p>
+          <p class="text-primary text-lg"> {{order.name}} | {{order.amount|intcomma}}</p>
+          <p class="text-error my-4">This action cannot be reverse!</p>
+          <div class="modal-action">
+            <form method="dialog">
+              <!-- if there is a button in form, it will close the modal -->
+              <a href="{% url 'delete-order' order.id %}" class="btn btn-error m-3">Yes</a>
+              <button class="btn btn-success ">No</button>
+            </form>
+          </div>
+        </div>
+    </dialog>
 
 
 {% endblock %}

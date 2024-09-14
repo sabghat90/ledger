@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% load humanize %}
 
 {% block title %}
 Expenses
@@ -25,7 +26,7 @@ Expenses
         {% for expense in expenses %}
         <tr class="hover" onclick="window.location.href='{% url "view-expense" expense.pk %}'" style="cursor: pointer;">
             <td>{{ forloop.counter }}</td>
-            <td>{{ expense.amount }}</td>
+            <td>{{ expense.amount|intcomma }}</td>
             <td>{{ expense.bank }}</td>
             <td>{{ expense.description }}</td>
             <td>{{ expense.created_at }}</td>

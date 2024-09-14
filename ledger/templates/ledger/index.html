@@ -20,7 +20,7 @@
 		<div class="stat place-items-center">
 		<div class="stat-title">Pending Orders</div>
 		<div class="stat-value text-warning">{{total_pending_orders_amount|intcomma}}</div>
-		<div class="stat-desc text-warning">↗︎ 40 (2%)</div>
+		<div class="stat-desc text-warning">↗︎ 40 ({{percentage_difference}}%)</div>
 		</div>
 	
 		<div class="stat place-items-center">
@@ -63,7 +63,7 @@
 		  </div>
 		  
 		  <div class="stat-title">Current Balance</div>
-		  <div class="stat-value text-primary">{{account.total_orders_amount|intcomma}}</div>
+		  <div class="stat-value text-primary">{{account.account.balance|intcomma}}</div>
 		  <div class="stat-desc">21% more than last month</div>
 		</div>
 	  
@@ -81,8 +81,8 @@
 				d="M13 10V3L4 14h7v7l9-11h-7z"></path>
 			</svg>
 		  </div>
-		  <div class="stat-title">Total Debits</div>
-		  <div class="stat-value text-secondary">2.6M</div>
+		  <div class="stat-title">Total Orders Amount</div>
+		  <div class="stat-value text-secondary">{{account.total_orders_amount|intcomma}}</div>
 		  <div class="stat-desc">21% more than last month</div>
 		</div>
 	  
@@ -94,7 +94,7 @@
 			  </div>
 			</div>
 		  </div>
-		  <div class="stat-value">{{account.account.account_holder_name}}</div>
+		  <div >{{account.account.account_holder_name}}</div>
 		  <div class="stat-title">{{account.account.account_number}}</div>
 		  <div class="stat-desc text-secondary">31 orders remaining</div>
 		</div>

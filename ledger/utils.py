@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 
 PENDING_ORDERS = "PENDING"
@@ -24,9 +23,11 @@ ACCOUNT_TYPES = [
     ('FIXED', 'Fixed Deposit'),
 ]
 
+GET_PREVIOUS_MONTH = lambda: datetime.now().month - 1
 GET_CURRENT_MONTH = lambda: datetime.now().month
 GET_CURRENT_MONTH_NAME = lambda: datetime.now().strftime('%B')
 GET_NEXT_MONTH_NAME = lambda: (datetime.now().replace(month=datetime.now().month + 1)).strftime('%B')
+
 
 def calculate_commission(amount):
     if amount < 100000:

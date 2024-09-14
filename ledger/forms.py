@@ -25,7 +25,7 @@ class RegisterForm(UserCreationForm):
 class AddOrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = ('created_at', 'name', 'account_number', 'amount', 'commission', 'order_type', 'credit_bank_account')
 
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
@@ -35,7 +35,7 @@ class AddOrderForm(forms.ModelForm):
 class AddAccountForm(forms.ModelForm):
     class Meta:
         model = Account
-        fields = '__all__'
+        fields = ('bank', 'account_number', 'account_holder_name', 'account_type', 'balance')
 
 
 class AddExpenseForm(forms.ModelForm):

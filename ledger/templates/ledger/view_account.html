@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% load humanize %}
 
 {% block title %}
 View Account
@@ -25,7 +26,7 @@ View Account
         </tr>
         <tr>
             <th style="text-align: left;">Balance</th>
-            <td>{{ account.balance }}</td>
+            <td>{{ account.balance|intcomma }}</td>
         </tr>
         <tr>
             <th style="text-align: left;">Bank Name</th>
@@ -68,7 +69,7 @@ View Account
                 <td>{{ forloop.counter }}</td>
                 <td>{{ order.created_at }}</td>
                 <td>{{ order.name }}</td>
-                <td>{{ order.amount }}</td>
+                <td>{{ order.amount|intcomma }}</td>
                 <td>{{ order.commission }}</td>
                 <td>{{ order.account_number }}</td>
                 <td>{{ order.agent }}</td>

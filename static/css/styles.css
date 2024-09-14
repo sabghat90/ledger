@@ -1,0 +1,17 @@
+.table-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+table {
+    border-collapse: collapse;
+    width: auto;
+    border-color: brown;
+}
+
+th, td {
+    padding: 4px;
+    text-align: left;
+}

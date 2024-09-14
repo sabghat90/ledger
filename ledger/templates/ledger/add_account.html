@@ -9,15 +9,65 @@ Add Account
 
 <div class="container mx-auto p-4">
     <h1 class="text-2xl font-bold mb-4">Add Account</h1>
+    {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
     <form method="post" action="{% url 'add-account' %}">
         {% csrf_token %}
+
+        <div class="flex items-center justify-center">
+        <table>
+            <tr>
+                <th style="text-align: left;">
+                    <label for="bank">Bank</label>
+                </th>
+                <tr>
+                    {% render_field form.bank id="bank" option="Select Bank" class="select select-bordered w-full max-w-xs m-4" %}
+                </tr>
+            </tr>
+
+            <tr>
+                <th style="text-align: left;">
+                    <label for="account_number">Account Number</label>
+                </th>
+                <tr>
+                    {% render_field form.account_number id="account_number" placeholder="Account Number" class="input input-bordered w-full max-w-xs m-4" %}
+                </tr>
+            </tr>
+
+            <tr>
+                <th style="text-align: left;">
+                    <label for="name">Name</label>
+                </th>
+                <td>
+                    {% render_field form.account_holder_name id="name" placeholder="Account Holder Name" class="input input-bordered w-full max-w-xs m-4" %}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="text-align: left;">
+                    <label for="account_type">Account Type</label>
+                </th>
+                <td>
+                    {% render_field form.account_type id="account_type" placeholder="Account Type" class="select select-bordered w-full max-w-xs m-4" %}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="text-align: left;">
+                    <label for="balance">Balance</label>
+                </th>
+                <td>
+                    {% render_field form.balance id="balance" placeholder="Balance" class="input input-bordered w-full max-w-xs m-4" %}
+                </td>
+            </tr>
+        </table>
+        </div>
         
-            {% render_field form.agent option="Select User" class="select select-bordered w-full max-w-xs m-4" %}
-            {% render_field form.bank option="Select Bank" class="select select-bordered w-full max-w-xs m-4" %}
-            {% render_field form.account_number placeholder="Account Number" class="input input-bordered w-full max-w-xs m-4" %}
-            {% render_field form.account_holder_name placeholder="Account Holder Name" class="input input-bordered w-full max-w-xs m-4" %}
-            {% render_field form.account_type placeholder="Account Type" class="select select-bordered w-full max-w-xs m-4" %}
-            {% render_field form.balance placeholder="Balance" class="input input-bordered w-full max-w-xs m-4" %}
+        
+        
         
         <div class="text-center m-4">
             <button type="submit" class="btn btn-wide">Submit</button>
