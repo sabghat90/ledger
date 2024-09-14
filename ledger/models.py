@@ -9,7 +9,7 @@ from . import utils
 
 # Create your models here.
 class Agent(AbstractUser):
-    phone_number = models.CharField(max_length=50, default="03327370770")
+    phone_number = models.CharField(max_length=50, default="")
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
 
     def __str__(self):
@@ -105,10 +105,10 @@ class OrderHistory(models.Model):
 
 class Expense(models.Model):
     agent = models.ForeignKey(Agent, on_delete=models.CASCADE)
-    bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     description = models.TextField()
-    created_at = models.DateField(auto_now=True)
+    created_at = models.DateField(default=timezone.now)
 
     def __str__(self):
         return f"{self.agent.username} - {self.amount}"

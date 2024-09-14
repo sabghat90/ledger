@@ -7,28 +7,36 @@ Accounts
 
 {% block content %}
 
-<div class="flex justify-end m-4">
-    <a role="button" class="btn" href="{% url "add-account" %}">Add Account</a>
-</div>
+
+<div class="flex flex-col w-full px-4 py-2">
+
+  <div class="flex justify-between">
+    <div>
+      <h1 class="text-2xl font-bold mb-4">Accounts</h1>
+    </div>
+    <div>
+      <a role="button" class="btn" href="{% url "add-account" %}">Add Account</a>
+    </div>
+  </div>
 
 <div class="overflow-x-auto">
-    <table class="table table-pin-cols table-zebra table-xs m-4">
+    <table class="table table-pin-cols table-pin-rows table-xs sm:table m-4">
       <thead>
         <tr>
           <th>ID</th>
-          <th>Account Number</th>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Bank Name</th>
-          <th>Balance</th>
-          <th>Created At</th>
-          <th>Updated At</th>
+          <td>Account Number</td>
+          <td>Name</td>
+          <td>Type</td>
+          <td>Bank Name</td>
+          <td>Balance</td>
+          <td>Created At</td>
+          <td>Updated At</td>
         </tr>
       </thead>
       <tbody>
         {% for account in accounts %}
-        <tr onclick="window.location.href='{% url "view-account" account.pk %}'" style="cursor: pointer;">
-            <td>{{ forloop.counter }}</td>
+        <tr class="hover" onclick="window.location.href='{% url "view-account" account.pk %}'" style="cursor: pointer;">
+            <th>{{ forloop.counter }}</th>
             <td>{{ account.account_number }}</td>
             <td>{{ account.account_holder_name }}</td>
             <td>{{ account.account_type }}</td>
@@ -42,16 +50,17 @@ Accounts
       <tfoot>
         <tr>
           <th>ID</th>
-          <th>Account Number</th>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Bank Name</th>
-          <th>Balance</th>
-          <th>Created At</th>
-          <th>Updated At</th>
+          <td>Account Number</td>
+          <td>Name</td>
+          <td>Type</td>
+          <td>Bank Name</td>
+          <td>Balance</td>
+          <td>Created At</td>
+          <td>Updated At</td>
         </tr>
       </tfoot>
     </table>
   </div>
+</div>
 
 {% endblock content %}

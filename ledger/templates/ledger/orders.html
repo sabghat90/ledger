@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% load widget_tweaks %}
 {% load humanize %}
 
 {% block title %}
@@ -7,28 +8,55 @@ Orders
 
 {% block content %}
 
-<div class="flex justify-end m-4">
+<div class="flex flex-col w-full px-4 py-2">
+
+<div class="flex justify-between">
+  <div>
+    <h1 class="text-2xl font-bold mb-4">Orders</h1>
+  </div>
+  <div>
     <a role="button" class="btn" href="{% url "add-order" %}">Add Order</a>
+  </div>
 </div>
 
-<div class="overflow-x-auto">
-    <table class="table table-pin-cols table-zebra table-xs m-4">
+<div>
+
+  <form id="filter-form" method="GET">
+    <div class="mt-4 grid grid-cols-1 gap-x-2 gap-y-4 sm:grid-cols-6">
+
+    <label for="order-type" class="text-sm font-medium leading-6">Order Type</label>
+    {%render_field order_filter.form.order_type id="order-type" type="select" name="order-type" class="select bg-base-200 rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"%}
+    
+    {% render_field order_filter.form.agent placeholder="Order Type" class="select select-bordered w-full max-w-xs" %}
+    
+    {% render_field order_filter.form.created_at placeholder="Date" type="date" class="bg-base-100 select-bordered w-full max-w-xs" %}
+    
+    {% render_field order_filter.form.name placeholder="Name" class="input input-bordered w-full max-w-xs" %}
+
+    <button type="submit" class="btn btn-success">Filter</button>
+  </form>
+</div>
+</div>
+
+
+<div class="overflow-x-auto mt-4">
+    <table class="table hover table-pin-rows table-pin-cols table-xs sm:table m-4">
       <thead>
         <tr>
           <th>ID</th>
-          <th>Date</th>
-          <th>Name</th>
-          <th>Amount</th>
-          <th>Commission</th>
-          <th>Account Number</th>
-          <th>Agent</th>
-          <th>Order Type</th>
+          <td>Date</td>
+          <td>Name</td>
+          <td>Amount</td>
+          <td>Commission</td>
+          <td>Account Number</td>
+          <td>Agent</td>
+          <td>Order Type</td>
         </tr>
       </thead>
       <tbody>
         {% for order in orders %}
         <tr class="hover" onclick="window.location.href='{% url "view-order" order.pk %}'" style="cursor: pointer;">
-            <td>{{ forloop.counter }}</td>
+            <th>{{ forloop.counter }}</th>
             <td>{{ order.created_at }}</td>
             <td>{{ order.name }}</td>
             <td>{{ order.amount|intcomma }}</td>
@@ -48,16 +76,18 @@ Orders
       <tfoot>
         <tr>
             <th>ID</th>
-            <th>Date</th>
-            <th>Name</th>
-            <th>Amount</th>
-            <th>Commission</th>
-            <th>Account Number</th>
-            <th>Agent</th>
-            <th>Order Type</th>
+            <td>Date</td>
+            <td>Name</td>
+            <td>Amount</td>
+            <td>Commission</td>
+            <td>Account Number</td>
+            <td>Agent</td>
+            <td>Order Type</td>
         </tr>
       </tfoot>
     </table>
   </div>
+
+</div>
 
 {% endblock content %}

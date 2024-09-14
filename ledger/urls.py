@@ -4,6 +4,8 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name="index"),
+
+
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
     path('register/', views.register, name='register'),
@@ -18,9 +20,12 @@ urlpatterns = [
     path('delete-order/<int:pk>/', views.delete_order, name='delete-order'),
     path('expense/', views.expense, name='expense'),
     path('add-expense/', views.add_expense, name='add-expense'),
-    path('view-expense/<int:pk>/', views.view_expense, name='view-expense'),
+    # path('view-expense/<int:pk>/', views.view_expense, name='view-expense'),
     path('update-expense/<int:pk>/', views.update_expense, name='update-expense'),
     path('delete-expense/<int:pk>/', views.delete_expense, name='delete-expense'),
     path('agents/', views.agents, name='agents'),
-    path('<int:pk>/view-agent/', views.view_agent, name='view-agent')
+    path('profile/<int:pk>/', views.profile, name='profile'),
 ]
+
+
+handler404 = 'ledger.views.aget_object_or_404'

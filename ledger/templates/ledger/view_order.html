@@ -50,9 +50,11 @@ View Order
 
     <div class="divider"></div>
 
+    {% if order.agent == request.user %}
     <a href="{% url 'update-order' order.id %}" class="btn btn-success">Edit</a>
 
     <button class="btn btn-error" onclick="delete_modal.showModal()">Delete</button>
+    {% endif %}
 
     <dialog id="delete_modal" class="modal sm:modal-middle">
         <div class="modal-box">

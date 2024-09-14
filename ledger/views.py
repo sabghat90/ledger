@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from .models import *
+from django.template import RequestContext
 from django.contrib.auth import login as auth_login
 from django.contrib import messages
 from .forms import *
@@ -7,41 +9,22 @@ from . import utils
 from django.db.models import Sum
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_not_required
+from .filters import OrderFilter
 
 User = get_user_model()
 
 
-def get_total_amount(order_type, month):
-    return int(Order.objects.filter(order_type=order_type, created_at__month=month).aggregate(Sum('amount'))['amount__sum'] or 0)
-
-
-def get_total_amount_for_month(month):
-    return int(Order.objects.filter(created_at__month=month).aggregate(Sum('amount'))['amount__sum'] or 0)
-
-
-def calculate_percentage_difference(current, previous):
-    if previous == 0:
-        return 0 if current == 0 else 100  # Avoid division by zero
-    return ((current - previous) / previous) * 100
-
+def aget_object_or_404(request, **kwargs):
+    return render(request, '404.html', status=404)
 
 def index(request):
-    current_month = utils.GET_CURRENT_MONTH()
-    previous_month = current_month - 1 if current_month > 1 else 12
+    accounts = Account.objects.filter(agent=request.user)
 
-    total_orders_current_month = get_total_amount_for_month(current_month)
-    total_orders_previous_month = get_total_amount_for_month(previous_month)
-
-    percentage_difference = calculate_percentage_difference(total_orders_current_month, total_orders_previous_month)
-
-    orders = Order.objects.all()
-    accounts = Account.objects.all()
-
-    total_paid_orders_amount = get_total_amount(utils.PAID_ORDERS, current_month)
-    total_pending_orders_amount = get_total_amount(utils.PENDING_ORDERS, current_month)
-    total_cancel_orders_amount = get_total_amount(utils.CANCEL_ORDERS, current_month)
-    total_orders_for_current_month = int(sum(order.amount for order in orders if order.created_at.month == current_month) or 0)
-    total_commission_for_current_month = int(sum(order.commission or 0 for order in orders if order.created_at.month == current_month))
+    total_paid_orders_amount = Order.objects.filter(agent=request.user, order_type=utils.PAID_ORDERS).aggregate(Sum('amount'))['amount__sum'] or 0
+    total_pending_orders_amount = Order.objects.filter(agent=request.user, order_type=utils.PENDING_ORDERS).aggregate(Sum('amount'))['amount__sum'] or 0
+    total_cancel_orders_amount = Order.objects.filter(agent=request.user, order_type=utils.CANCEL_ORDERS).aggregate(Sum('amount'))['amount__sum'] or 0
+    current_month_paid_orders_amount = Order.objects.filter(agent=request.user, order_type=utils.PAID_ORDERS, created_at__month=utils.GET_CURRENT_MONTH()).aggregate(Sum('amount'))['amount__sum'] or 0
+    total_commission = Order.objects.filter(agent=request.user, order_type=utils.PAID_ORDERS).aggregate(Sum('commission'))['commission__sum'] or 0
 
     accounts_with_total_orders = [
         {
@@ -52,15 +35,14 @@ def index(request):
     ]
 
     context = {
+        'accounts_with_total_orders': accounts_with_total_orders,
+        'current_month': utils.GET_CURRENT_MONTH_NAME,
+        'next_month': utils.GET_NEXT_MONTH_NAME,
         'total_paid_orders_amount': total_paid_orders_amount,
         'total_pending_orders_amount': total_pending_orders_amount,
         'total_cancel_orders_amount': total_cancel_orders_amount,
-        'total_orders_for_current_month': total_orders_for_current_month,
-        'accounts_with_total_orders': accounts_with_total_orders,
-        'total_commission_for_current_month': total_commission_for_current_month,
-        'current_month_name': utils.GET_CURRENT_MONTH_NAME,
-        'next_month': utils.GET_NEXT_MONTH_NAME,
-        'percentage_difference': percentage_difference,
+        'current_month_paid_orders_amount': current_month_paid_orders_amount,
+        'total_commission': total_commission,
     }
 
     return render(request, 'ledger/index.html', context)
@@ -106,11 +88,15 @@ def orders(request):
     PAID = utils.PAID_ORDERS
     CANCEL = utils.CANCEL_ORDERS
 
+    order_filter = OrderFilter(request.GET, queryset=orders)
+    orders = order_filter.qs
+
     context = {
         'orders': orders,
         'PENDING': PENDING,
         'PAID': PAID,
         'CANCEL': CANCEL,
+        'order_filter': order_filter
     }
     return render(request, 'ledger/orders.html', context)
 
@@ -250,20 +236,22 @@ def delete_order(request, pk):
 
 
 def expense(request):
-    expenses = Expense.objects.all()
+    expenses = Expense.objects.filter(agent=request.user)
     return render(request, 'ledger/expense.html', {'expenses': expenses})
 
 
 def add_expense(request):
     if request.method == 'POST':
         form = AddExpenseForm(request.POST)
-        expense_amount = form.cleaned_data['amount']
+        
         if form.is_valid():
             expense = form.save(commit=False)
-            account = form.cleaned_data['bank']
+            expense_amount = form.cleaned_data['amount']
+            account = form.cleaned_data['account']
             if account.balance < expense_amount:
                 return render(request, 'ledger/add_expense.html', {'form': form, 'error': 'Insufficient balance'})
             account.balance -= expense_amount
+            expense.agent = request.user
             account.save()
             expense.save()
             return redirect('expense')
@@ -306,12 +294,20 @@ def agents(request):
     return render(request, 'ledger/agents.html', context)
 
 
-def view_agent(request, pk):
+def profile(request, pk):
     agent = get_object_or_404(Agent, pk=pk)
     orders = Order.objects.filter(agent=agent)
-
+    total_orders = Order.objects.filter(agent=agent).count()
+    total_paid_orders = Order.objects.filter(agent=agent, order_type=utils.PAID_ORDERS).count()
+    total_paid_orders_amount = Order.objects.filter(agent=agent, order_type=utils.PAID_ORDERS).aggregate(Sum('amount'))['amount__sum'] or 0
+    total_paid_orders_commission = Order.objects.filter(agent=agent, order_type=utils.PAID_ORDERS).aggregate(Sum('commission'))['commission__sum'] or 0
+    
     context = {
         'agent': agent,
         'orders': orders,
+        'total_orders': total_orders,
+        'total_paid_orders': total_paid_orders,
+        'total_paid_orders_amount': total_paid_orders_amount,
+        'total_paid_orders_commission': total_paid_orders_commission,
     }
-    return render(request, 'ledger/view_agent.html', context)
+    return render(request, 'ledger/profile.html', context)

@@ -1,119 +1,152 @@
-{% extends "layout.html" %} {% load widget_tweaks %} {% block title %} Add Order
-{% endblock title %} {% block content %} {% comment %}
-<div class="container mx-auto p-4">
-  <h1 class="text-2xl font-bold mb-4">
-    {% if form.instance.pk %} Update Order {% else %} Add Order {% endif %}
-  </h1>
-  {% endcomment %}
+{% extends "layout.html" %} 
+{% load widget_tweaks %}
 
-  <div class="relative flex flex-col justify-center h-screen overflow-hidden">
-    <div class="w-full p-6 m-auto rounded-md shadow-md lg:max-w-xl">
-      <h1 class="text-3xl font-semibold text-center text-purple-700">
-        {% if form.instance.pk %} Update Order {% else %} Add Order {% endif %}
-      </h1>
+{% block title %} 
+Add Order
+{% endblock title %} 
 
-      <form
+{% block content %}
+
+
+
+<div class="pb-12">
+  <h2 class="text-base font-semibold leading-7">
+    {% if form.instance.pk %}Update Order{% else %}Add Order{% endif %}
+  </h2>
+
+  <form method="POST" action="{% if form.instance.pk %}{% url 'update-order' form.instance.pk %}{% else %}{% url 'add-order' %}{% endif %}">
+  
+    {% csrf_token %}
+    <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+
+    <div class="sm:col-span-3">
+      <label for="name" class="block text-sm font-medium leading-6">Name</label>
+      <div class="mt-2">
+        {%render_field form.name type="text" name="name" id="name" class="block w-full bg-base-200 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"%}
+      </div>
+    </div>
+
+    <div class="sm:col-span-3">
+      <label for="account-number" class="block text-sm font-medium leading-6">Account Number</label>
+      <div class="mt-2">
+        {%render_field form.account_number type="text" name="account-number" id="account-number" class="block bg-base-200 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"%}
+      </div>
+    </div>
+
+    <div class="sm:col-span-2">
+      <label for="created_at" class="block text-sm font-medium leading-6">Date</label>
+      <div class="mt-2">
+        {%render_field form.created_at type="date" name="created_at" id="created_at" class="block bg-base-200 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"%}
+      </div>
+    </div>
+
+    <div class="sm:col-span-2">
+      <label for="amount" class="block text-sm font-medium leading-6">Amount</label>
+      <div class="mt-2">
+        {%render_field form.amount type="number" name="amount" id="amount" class="block w-full bg-base-200 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"%}
+      </div>
+    </div>
+
+    <div class="sm:col-span-2">
+      <label for="commission" class="block text-sm font-medium leading-6">Commission</label>
+      <div class="mt-2">
+        {%render_field form.commission type="number" name="commission" id="commission" class="block bg-base-200 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"%}
+      </div>
+    </div>
+
+    <div class="sm:col-span-3">
+      <label for="order-type" class="block text-sm font-medium leading-6">Order Type</label>
+      <div class="mt-2">
+        {%render_field form.order_type id="order-type" name="order-type" class="block w-full bg-base-200 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"%}
+          
+      </div>
+    </div>
+
+    <div class="sm:col-span-3">
+      <label for="credit-bank-account" class="block text-sm font-medium leading-6">Credit Bank Account</label>
+      <div class="mt-2">
+        {%render_field form.credit_bank_account id="credit-bank-account" name="credit-bank-account" class="block bg-base-200 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"%}
+          
+      </div>
+    </div>
+
+  </div>
+  <div class="text-center pt-8">
+    {% if form.instance.pk %}
+    <button type="submit" class="btn btn-success btn-wide">Update</button>
+    {% else %}
+    <button type="submit" class="btn btn-success btn-wide">Submit</button>
+    {% endif %}
+    </div>
+</div>
+
+
+
+  </form>
+
+
+
+
+{% comment %} 
+
+<div class="form-container">
+  <form
         class="space-y-4"
         method="post"
         action="{% if form.instance.pk %}{% url 'update-order' form.instance.pk %}{% else %}{% url 'add-order' %}{% endif %}">
-        <div>
-          <label class="label">
-            <span class="text-base label-text">Date</span>
-          </label>
-          {% render_field form.created_at placeholder="Date" type="date"
-          class="w-full max-w-xs m-4" %}
-        </div>
-        <div>
-          <label class="label">
-            <span class="text-base label-text">Name</span>
-          </label>
-          {% render_field form.name placeholder="Name" class="input
-          input-bordered w-full max-w-xs m-4" %}
-        </div>
-        <div>
-          <label class="label">
-            <span class="text-base label-text">Account Number</span>
-          </label>
-          {% render_field form.account_number placeholder="Account Number"
-          class="input input-bordered w-full max-w-xs m-4" %}
-        </div>
-        <div>
-          <label class="label">
-            <span class="text-base label-text">Amount</span>
-          </label>
-          {% render_field form.amount placeholder="Amount" id="amount"
-          name="amount" oninput="formatAmount(this)" class="input input-bordered
-          w-full max-w-xs m-4" %}
-        </div>
 
-        <div>
-          <label class="label">
-            <span class="text-base label-text">Commission</span>
-          </label>
-          {% render_field form.commission placeholder="Commission" class="input
-          input-bordered w-full max-w-xs m-4" %}
-        </div>
-
-        <div>
-          <label class="label">
-            <span class="text-base label-text">Order Type</span>
-          </label>
-          {% render_field form.order_type placeholder="Order Type" class="select
-          select-bordered w-full max-w-xs m-4" %}
-        </div>
-
-        <div>
-          <label class="label">
-            <span class="text-base label-text">Credit Bank Account</span>
-          </label>
-          {% render_field form.credit_bank_account placeholder="Credit Bank
-          Account" class="select select-bordered w-full max-w-xs m-4" %}
-        </div>
-
-        <div>
-          <label class="label">
-            <span class="text-base label-text">Agent Name</span>
-          </label>
-          {% render_field form.agent_name placeholder="Agent Name" class="input
-          input-bordered w-full max-w-xs m-4" %}
-        </div>
-
-        <div>
-          {% if form.instance.pk %}
-          <button type="submit" class="btn btn-block">Update</button>
-          {% else %}
-          <button type="submit" class="btn btn-block">Submit</button>
-          {% endif %}
-        </div>
-      </form>
+    <div>
+      <label class="label-date">
+      <span class="text-base label-text">Date</span>
+      </label>
+      {% render_field form.created_at placeholder="Date" type="date" class="bg-base-100 w-full max-w-xs" %}
     </div>
-  </div>
-  {% comment %}
-  <form
-    method="post"
-    action="{% if form.instance.pk %}{% url 'update-order' form.instance.pk %}{% else %}{% url 'add-order' %}{% endif %}"
-  >
-    {% csrf_token %} {% render_field form.created_at placeholder="Date"
-    type="date" class="w-full max-w-xs m-4" %} {% render_field form.name
-    placeholder="Name" class="input input-bordered w-full max-w-xs m-4" %} {%
-    render_field form.account_number placeholder="Account Number" class="input
-    input-bordered w-full max-w-xs m-4" %} {% render_field form.amount
-    placeholder="Amount" id="amount" name="amount" oninput="formatAmount(this)"
-    class="input input-bordered w-full max-w-xs m-4" %} {% render_field
-    form.commission placeholder="Commission" class="input input-bordered w-full
-    max-w-xs m-4" %} {% render_field form.order_type placeholder="Order Type"
-    class="select select-bordered w-full max-w-xs m-4" %} {% render_field
-    form.credit_bank_account placeholder="Credit Bank Account" class="select
-    select-bordered w-full max-w-xs m-4" %} {% render_field form.agent_name
-    placeholder="Agent Name" class="input input-bordered w-full max-w-xs m-4" %}
 
-    <div class="text-center m-4">
-      {% if form.instance.pk %}
-      <button type="submit" class="btn btn-wide">Update</button>
-      {% else %}
-      <button type="submit" class="btn btn-wide">Submit</button>
-      {% endif %}
+    <div>
+      <label class="label-name">
+      <span class="text-base label-text">Name</span>
+      </label>
+      {% render_field form.name placeholder="Name" class="input input-bordered w-full max-w-xs" %}
     </div>
+
+    <div>
+      <label class="label-account-number">
+      <span class="text-base label-text">Account Number</span>
+      </label>
+      {% render_field form.account_number placeholder="Account Number" class="input input-bordered w-full max-w-xs" %}
+    </div>
+      
+    <div>
+      <label class="label-amount">
+      <span class="text-base label-text">Amount</span>
+      </label>
+      {% render_field form.amount placeholder="Amount" id="amount" name="amount" oninput="formatAmount(this)" class="input input-bordered w-full max-w-xs" %}
+    </div>
+
+    <div>
+      <label class="label-commission">
+      <span class="text-base label-text">Commission</span>
+      </label>
+      {% render_field form.commission placeholder="Commission" class="input input-bordered w-full max-w-xs" %}
+    </div>
+
+    <div>
+      <label class="label-order-type">
+      <span class="text-base label-text">Order Type</span>
+      </label>
+      {% render_field form.order_type placeholder="Order Type" class="select select-bordered w-full max-w-xs" %}
+    </div>
+
+    <div>
+      <label class="label-cr-bank-account">
+      <span class="text-base label-text">Credit Bank Account</span>
+      </label>
+      {% render_field form.credit_bank_account placeholder="Credit Bank Account" class="select select-bordered w-full max-w-xs" %}
+    </div>
+
   </form>
-  {% endcomment %} {% endblock content %}
-</div>
+</div> {% endcomment %}
+
+
+
+{% endblock content %}

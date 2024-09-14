@@ -1,17 +1,17 @@
-.table-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+body {
+    margin: 0!important;
+    max-width: 100%;
 }
 
-table {
-    border-collapse: collapse;
-    width: auto;
-    border-color: brown;
+.navbar-box {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 }
 
-th, td {
-    padding: 4px;
-    text-align: left;
+@media print {
+    .navbar, .drawer-button {
+        display: none;
+    }
 }

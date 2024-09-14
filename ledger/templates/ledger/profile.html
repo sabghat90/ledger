@@ -1,0 +1,94 @@
+{% extends "layout.html" %} 
+{% load widget_tweaks %}
+{% load humanize %}
+
+{% block title %} Profile
+{% endblock title %} {% block content %}
+
+<div class="grid grid-flow-row justify-center items-start sm:grid-flow-col">
+  
+  <div class="p-4">
+  
+  <div class="card bg-base-100 w-96 shadow-xl">
+    <figure class="px-10 pt-10">
+      {% if agent.profile_picture %}
+      <div class="avatar">
+        <div class="w-40 rounded-full">
+          <img alt="agent profile" src="{{ agent.profile_picture.url }}" />
+        </div>
+      </div>
+    
+      {% else %}
+      <div class="avatar">
+        <div class="w-24 rounded-full">
+          <img alt="agent profile" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"/>
+        </div>
+      </div>
+      {% endif %}
+
+    </figure>
+    <div class="card-body items-center text-center">
+      <h2 class="card-title">{{ agent.first_name}} {{ agent.last_name}}</h2>
+      <p>{{request.user.phone_number}}</p>
+      
+      <div class="divider"></div>
+
+      <p>Username: {{agent.username}}</p>
+      <div class="card-actions">
+        {% if agent == request.user %}
+        <button class="btn btn-primary">Edit Profile</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="grid grid-cols-2 gap-4 items-center sm:grid-cols-2 sm:text-center">
+  <div class="stats shadow">
+    <div class="stat">
+      <div class="stat-title">Total Orders</div>
+      <div class="stat-value">{{total_orders|intcomma}}</div>
+      <div class="stat-desc">21% more than last month</div>
+    </div>
+  </div>
+
+  <div class="stats shadow">
+    <div class="stat">
+      <div class="stat-title">Total Paid Orders</div>
+      <div class="stat-value">{{total_paid_orders|intcomma}}</div>
+      <div class="stat-desc">21% more than last month</div>
+    </div>
+  </div>
+
+  <div class="stats shadow">
+    <div class="stat">
+      <div class="stat-title">Total Paid Orders Amount</div>
+      <div class="stat-value">PKR ({{total_paid_orders_amount|intcomma}})</div>
+      <div class="stat-desc">21% more than last month</div>
+    </div>
+  </div>
+
+  {% if agent == request.user %}
+  <div class="stats shadow">
+    <div class="stat">
+      <div class="stat-title">Total Commission</div>
+      <div class="stat-value">PKR ({{total_paid_orders_commission|intcomma}})</div>
+      <div class="stat-desc">21% more than last month</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="stats shadow">
+    <div class="stat">
+      <div class="stat-title">Total Page Views</div>
+      <div class="stat-value">89,400</div>
+      <div class="stat-desc">21% more than last month</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+{% endblock content %}

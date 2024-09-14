@@ -7,27 +7,34 @@ Expenses
 
 {% block content %}
 
-<div class="flex justify-end m-4">
-    <a role="button" class="btn" href="{% url "add-expense" %}">Add Expense</a>
-</div>
+<div class="flex flex-col w-full px-4 py-2">
+
+  <div class="flex justify-between">
+    <div>
+      <h1 class="text-2xl font-bold mb-4">Expenses</h1>
+    </div>
+    <div>
+      <a role="button" class="btn" href="{% url "add-expense" %}">Add Expense</a>
+    </div>
+  </div>
 
 <div class="overflow-x-auto">
-    <table class="table table-pin-cols table-zebra table-xs m-4">
+    <table class="table table-pin-cols hover table-pin-rows table-xs sm:table m-4">
       <thead>
         <tr>
           <th>ID</th>
-          <th>Amount</th>
-          <th>Bank</th>
-          <th>Desciption</th>
-          <th>Created At</th>
+          <td>Amount</td>
+          <td>Bank</td>
+          <td>Desciption</td>
+          <td>Created At</td>
         </tr>
       </thead>
       <tbody>
         {% for expense in expenses %}
         <tr class="hover" onclick="window.location.href='{% url "view-expense" expense.pk %}'" style="cursor: pointer;">
-            <td>{{ forloop.counter }}</td>
+            <th>{{ forloop.counter }}</th>
             <td>{{ expense.amount|intcomma }}</td>
-            <td>{{ expense.bank }}</td>
+            <td>{{ expense.account }}</td>
             <td>{{ expense.description }}</td>
             <td>{{ expense.created_at }}</td>
         </tr>
@@ -36,10 +43,10 @@ Expenses
       <tfoot>
         <tr>
             <th>ID</th>
-            <th>Amount</th>
-            <th>Bank</th>
-            <th>Desciption</th>
-            <th>Created At</th>
+            <td>Amount</td>
+            <td>Bank</td>
+            <td>Desciption</td>
+            <td>Created At</td>
         </tr>
       </tfoot>
     </table>

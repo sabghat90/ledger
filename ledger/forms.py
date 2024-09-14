@@ -41,4 +41,4 @@ class AddAccountForm(forms.ModelForm):
 class AddExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
-        fields = '__all__'
+        fields = ('account', 'amount', 'description', 'created_at')
